@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "801373915476",
+    "firebase_url": "https://scoutingtest-d9141.firebaseio.com",
+    "project_id": "scoutingtest-d9141",
+    "storage_bucket": "scoutingtest-d9141.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:801373915476:android:220243385ddd6a4750a0c1",
+        "android_client_info": {
+          "package_name": "com.frc.thawkmscouting"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "801373915476-dl4769op7ff0d7udjfu9mg08nf0rjeqc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.frc.thawkmscouting",
+            "certificate_hash": "95d5a4720a1808924803f772c969cf28084fa9ae"
+          }
+        },
+        {
+          "client_id": "801373915476-gjekt721cc2bfia5h8kaed0psubr7nbv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwd8e4AAO29AyjcP0botDuRIl3ysx61Mo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "801373915476-gjekt721cc2bfia5h8kaed0psubr7nbv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
