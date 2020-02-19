@@ -1,19 +1,19 @@
 {
   "Version": "1.0",
-  "CredentialsProvider": {
-    "CognitoIdentity": {
-      "Default": {
-        "PoolId": "us-east-1:fd6cfc8f-1218-436e-9a4c-5194cd8db62b",
-        "Region": "us-east-1"
-      }
+  "DynamoDBObjectMapper" : {
+    "Default" : {
+      "Region" : "XX-XXXXX-XX"
     }
   },
   "IdentityManager": {
     "Default": {}
   },
-  "DynamoDBObjectMapper": {
-    "Default": {
-      "Region": "us-east-1"
+  "CredentialsProvider": {
+    "CognitoIdentity": {
+      "Default": {
+        "PoolId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "Region": "XX-XXXXX-X"
+      }
     }
   }
 }

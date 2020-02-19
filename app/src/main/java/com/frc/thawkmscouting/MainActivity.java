@@ -4,35 +4,60 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
+import com.amazonaws.regions.Regions;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-/**
- * Combines data from 6 QR codes and pushes the data to Firebase
+import com.amazonaws.mobile.client.AWSMobileClient;
+import com.amazonaws.mobile.client.AWSStartupHandler;
+import com.amazonaws.mobile.client.AWSStartupResult;
+
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.regions.Region;
+import com.amazonaws.ClientConfiguration;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.Inet4Address;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+import java.io.File;
+import java.io.FileOutputStream;
+
+/**q
+ * Combines data from 6 QR codes and pushes the data to AWS
  *
  * @author Aniketh Dandu - Team 1100
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
     /* The data from the six QR codes */
     final String[] DATA_FILES = new String[6];
     /* The labels for the six files */
     final TextView[] FILE_LABELS = new TextView[6];
+
+    /* REPLACE THIS WITH THE COGNITO USER POOL ID */
+    final String ID = "XXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+    /* REPLACE THIS WITH THE REGION YOUR DATABASE IS SET UP IN */
+    final Regions REGION = Regions.DEFAULT_REGION;
+
+    DynamoDBMapper dynamoDBMapper;
 
     /**
      * Set the UI elements and the button listeners
@@ -46,9 +71,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /* ID the QR button and set a listener */
-        final Button SCAN_BUTTON = findViewById(R.id.button);
-        SCAN_BUTTON.setOnClickListener(this);
+        AWSMobileClient.getInstance().initialize(this, new AWSStartupHandler() {
+
+            @Override
+            public void onComplete(AWSStartupResult awsStartupResult) {
+
+                CognitoCachingCredentialsProvider cognitoCachingCredentialsProvider = new CognitoCachingCredentialsProvider(
+                        getApplicationContext(),
+                        ID,
+                        REGION
+                );
+
+                // Add code to instantiate a AmazonDynamoDBClient
+                AmazonDynamoDBClient ddbClient = Region.getRegion(REGION)
+                        .createClient(
+                                AmazonDynamoDBClient.class,
+                                cognitoCachingCredentialsProvider,
+                                new ClientConfiguration()
+                        );
+
+                dynamoDBMapper = DynamoDBMapper.builder()
+                        .dynamoDBClient(ddbClient)
+                        .awsConfiguration(
+                                AWSMobileClient.getInstance().getConfiguration())
+                        .build();
+
+            }
+        }).execute();
 
         /* ID the labels displaying the file names */
         FILE_LABELS[0] = findViewById(R.id.textView);
@@ -64,7 +113,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         /* When the subtract button is clicked, remove the last slot and file label text */
-        findViewById(R.id.subtractBttn).setOnClickListener(new View.OnClickListener() {
+        final Button REMOVE_BUTTON = findViewById(R.id.removeButton);
+        REMOVE_BUTTON.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 for (int index = 6; index > 0; index--) {
@@ -78,26 +128,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        /* When the export button is clicked, push the data to Firebase */
-        findViewById(R.id.exportButton).setOnClickListener(new View.OnClickListener() {
+        /* When the export button is clicked, push the data to AWS */
+        final Button EXPORT_BUTTON = findViewById(R.id.exportButton);
+        EXPORT_BUTTON.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 uploadData();
             }
         });
-    }
 
-    /**
-     * If the QR button is clicked, grab the data
-     *
-     * @param view The view of the clicked button
-      */
-    @Override
-    public void onClick(View view) {
-        if (view.getId() == (R.id.button)) {
-            final IntentIntegrator INTEGRATOR = new IntentIntegrator(this);
-            INTEGRATOR.initiateScan();
-        }
+        final Button SCAN_BUTTON = findViewById(R.id.scanButton);
+        SCAN_BUTTON.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final IntentIntegrator INTEGRATOR = new IntentIntegrator(MainActivity.this);
+                INTEGRATOR.initiateScan();
+            }
+        });
     }
 
     /**
@@ -126,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             /* Split the data into an array */
                             String[] DATA_ARRAY = DATA_FILES[i].split(",");
                             /* Determine the correct color corresponding to that team */
-                            final int COLOR = DATA_ARRAY[2].equals("red")
+                            final int COLOR = DATA_ARRAY[2].toLowerCase().equals("red")
                                     ? getResources().getColor(R.color.red)
                                     : getResources().getColor(R.color.blue);
                             /* Set the label text color the corresponding color (for the user) */
@@ -149,56 +196,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
-     * Upload data to Firebase and update a list of teams
+     * Upload data to AWS
      */
     private void uploadData() {
         try {
-            /* The event entered by the user */
-            String event = ((TextView)findViewById(R.id.eventText)).getText().toString();
-            /* If the user did not enter an event, notify the user and set a default name */
-            if (event.isEmpty()) {
-                Toast.makeText(MainActivity.this,"Entered empty event", Toast.LENGTH_LONG).show();
-                event = "Non-existent event";
-            }
-
-            /* Create OR locate a temporary file to hold the list of teams who have data */
-            final File TEAMS_LIST = File.createTempFile(event, ".txt", this.getFilesDir());
-            /* Create a reader for the file */
-            final BufferedReader BUFFERED_READER = new BufferedReader(new FileReader(TEAMS_LIST));
-            /* Create a map containing all the scouted teams */
-            final HashMap<String, Object> TEAMS = new HashMap<>();
-
-            /* Update the map with previously entered teams */
-            for (int i = 0; i < TEAMS_LIST.length(); i++) {
-                TEAMS.put(String.valueOf(i+1), BUFFERED_READER.readLine());
-            }
-
-            /* Create a reference to the database and document */
-            final DocumentReference REFERENCE = FirebaseFirestore.getInstance()
-                    .collection("Events")
-                    .document(event);
             /* Loop through the six strings of data */
-            for(int i = 0; i < 6; i++) {
-                /* Split the data into an array */
-                final String DATA = DATA_FILES[i];
-                /* Set the team to the first item in the array */
-                final String TEAM = DATA.split(",")[0];
-                final String MATCH = DATA.split(",")[1];
-                /* Locate the correct reference to the specified team and push the corresponding data */
-                REFERENCE.collection(TEAM).document("Match data").set(returnData(DATA, MATCH), SetOptions.merge());
-                if (!TEAMS.containsValue(TEAM)) {
-                    /* If the list of teams does not already contain the team, update the list */
-                    TEAMS.put(String.valueOf(TEAMS.size()+1), TEAM);
+            exportJSON();
+            Toast.makeText(MainActivity.this, "JSON file updated", Toast.LENGTH_SHORT).show();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    for(int i = 0; i < 6; i++) {
+                        dynamoDBMapper.save(returnMatch(i));
+                    }
                 }
-            }
-            /* Update the database with the list of teams who have been scouted */
-            REFERENCE.set(TEAMS);
+            }).start();
 
             Toast.makeText(MainActivity.this, "Database updated", Toast.LENGTH_LONG).show();
         }
         /* Display error message if user did not scan six QR codes */
         catch (NullPointerException e) {
-            Toast.makeText(MainActivity.this, "One or more empty data slots", Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this, "One or more empty data slots. Please scan all 6 QR codes", Toast.LENGTH_LONG).show();
         }
         /* Display an error message for any other error */
         catch (Exception e) {
@@ -206,11 +224,132 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    /* Return inputted data as a map */
     @SuppressLint("DefaultLocale")
-    private Map returnData(String values, String match) {
-        Map <String, Object> data = new HashMap<>();
-        data.put(String.format("Match %s", match), values);
-        return data;
+    private MatchData returnMatch(int index) {
+        final String[] DATA = DATA_FILES[index].split(",");
+        MatchData matchData = new MatchData();
+        matchData.setTeam(DATA[0]);
+        matchData.setMatch(DATA[1]);
+        matchData.setColor(DATA[2].toLowerCase());
+        matchData.setDriverStation(Integer.valueOf(DATA[3]));
+        final HashMap<String, Integer> AUTO_HITS = new HashMap<String, Integer>() {
+            {
+                put("Inner", Integer.valueOf(DATA[4]));
+                put("Outer", Integer.valueOf(DATA[5]));
+                put("Bottom", Integer.valueOf(DATA[6]));
+            }
+        };
+        matchData.setAutoHits(AUTO_HITS);
+        final HashMap<String, Integer> AUTO_MISS = new HashMap<String, Integer>() {
+            {
+                put("High", Integer.valueOf(DATA[7]));
+                put("Low", Integer.valueOf(DATA[8]));
+            }
+        };
+        matchData.setAutoMiss(AUTO_MISS);
+        matchData.setTimePlayingDefense(Integer.valueOf(DATA[9]));
+        matchData.setTimeDefenseOnTeam(Integer.valueOf(DATA[10]));
+        matchData.setPenalties(Integer.valueOf(DATA[11]));
+        final HashMap<String, HashMap<String, Integer>> SCORING = new HashMap<>();
+        for(int i = 0; i < 6; i++) {
+            final int INDEX = i;
+            final HashMap SCORING_MAP = new HashMap<String, Integer>() {
+                {
+                    put("Inner", Integer.valueOf(DATA[5*INDEX+12]));
+                    put("Outer", Integer.valueOf(DATA[5*INDEX+13]));
+                    put("Bottom", Integer.valueOf(DATA[5*INDEX+14]));
+                    put("High", Integer.valueOf(DATA[5*INDEX+15]));
+                    put("Low", Integer.valueOf(DATA[5*INDEX+16]));
+                }
+            };
+            SCORING.put(String.format("Position: %d", INDEX), SCORING_MAP);
+        }
+        matchData.setScoring(SCORING);
+        matchData.setRotationControl(Boolean.valueOf(DATA[42]));
+        matchData.setColorControl(Boolean.valueOf(DATA[43]));
+        matchData.setAttemptedClimb(Boolean.valueOf(DATA[44]));
+        matchData.setClimb(Boolean.valueOf(DATA[45]));
+        matchData.setLevel(Boolean.valueOf(DATA[46]));
+        matchData.setAttemptedDoubleClimb(Boolean.valueOf(DATA[47]));
+        matchData.setDoubleClimb(Boolean.valueOf(DATA[48]));
+        matchData.setBrownedOut(Boolean.valueOf(DATA[49]));
+        matchData.setDisabled(Boolean.valueOf(DATA[50]));
+        matchData.setYellowCard(Boolean.valueOf(DATA[51]));
+        matchData.setRedCard(Boolean.valueOf(DATA[52]));
+        matchData.setNotes((DATA[53]));
+        return matchData;
+    }
+
+    @SuppressLint("DefaultLocale")
+    private void exportJSON() {
+        final String MATCH = DATA_FILES[0].split(",")[1];
+        final JSONArray JSON_ARRAY = new JSONArray();
+        for(int i = 0; i < 6; i++) {
+            Map<String, Object> JSONMap = new HashMap<>();
+            final String[] DATA = DATA_FILES[i].split(",");
+            JSONMap.put("Teams", DATA[0]);
+            JSONMap.put("Match", DATA[1]);
+            JSONMap.put("Color", DATA[2].toLowerCase());
+            JSONMap.put("Driver Station", Integer.valueOf(DATA[3]));
+            final HashMap<String, Integer> AUTO_HITS = new HashMap<String, Integer>() {
+                {
+                    put("Inner", Integer.valueOf(DATA[4]));
+                    put("Outer", Integer.valueOf(DATA[5]));
+                    put("Bottom", Integer.valueOf(DATA[6]));
+                }
+            };
+            JSONMap.put("Auto Hits", AUTO_HITS);
+            final HashMap<String, Integer> AUTO_MISS = new HashMap<String, Integer>() {
+                {
+                    put("High", Integer.valueOf(DATA[7]));
+                    put("Low", Integer.valueOf(DATA[8]));
+                }
+            };
+            JSONMap.put("Auto Miss", AUTO_MISS);
+            JSONMap.put("Time Playing Defense", (Integer.valueOf(DATA[9])));
+            JSONMap.put("Time Defense On Team", (Integer.valueOf(DATA[9])));
+            JSONMap.put("Penalties", (Integer.valueOf(DATA[11])));
+            final HashMap<String, HashMap<String, Integer>> SCORING = new HashMap<>();
+            for(int x = 0; x < 6; x++) {
+                final int INDEX = x;
+                final HashMap SCORING_MAP = new HashMap<String, Integer>() {
+                    {
+                        put("Inner", Integer.valueOf(DATA[5*INDEX+12]));
+                        put("Outer", Integer.valueOf(DATA[5*INDEX+13]));
+                        put("Bottom", Integer.valueOf(DATA[5*INDEX+14]));
+                        put("High", Integer.valueOf(DATA[5*INDEX+15]));
+                        put("Low", Integer.valueOf(DATA[5*INDEX+16]));
+                    }
+                };
+                SCORING.put(String.format("Position: %d", INDEX), SCORING_MAP);
+            }
+            JSONMap.put("Scoring", SCORING);
+            JSONMap.put("Rotation Control", (Boolean.valueOf(DATA[42])));
+            JSONMap.put("Color Control", (Boolean.valueOf(DATA[43])));
+            JSONMap.put("Attempted CLimb", (Boolean.valueOf(DATA[44])));
+            JSONMap.put("Climb", (Boolean.valueOf(DATA[45])));
+            JSONMap.put("Level", (Boolean.valueOf(DATA[46])));
+            JSONMap.put("Attempted Double Climb", (Boolean.valueOf(DATA[47])));
+            JSONMap.put("Double Climb", (Boolean.valueOf(DATA[48])));
+            JSONMap.put("Browned Out", (Boolean.valueOf(DATA[49])));
+            JSONMap.put("Disabled", (Boolean.valueOf(DATA[50])));
+            JSONMap.put("Yellow Card", (Boolean.valueOf(DATA[51])));
+            JSONMap.put("Red Card", (Boolean.valueOf(DATA[52])));
+            JSONMap.put("Notes", (DATA[53]));
+            JSON_ARRAY.put(new JSONObject(JSONMap));
+        }
+        try {
+            final File JSON_FILE = new File((Environment.getExternalStorageDirectory() + "/THawkScouting"), (MATCH + ".txt"));
+            final PrintWriter PRINT_WRITER = new PrintWriter(new FileOutputStream(JSON_FILE, false));
+            PRINT_WRITER.println(JSON_ARRAY.toString(0));
+            PRINT_WRITER.flush();
+            PRINT_WRITER.close();
+        }
+        catch (org.json.JSONException e) {
+            Toast.makeText(getApplicationContext(), "JSON error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+        catch (IOException e) {
+            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 }
