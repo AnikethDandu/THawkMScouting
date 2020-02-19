@@ -2,21 +2,15 @@ package com.frc.thawkmscouting;
 
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBAttribute;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBHashKey;
-import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBIndexHashKey;
-import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBIndexRangeKey;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBRangeKey;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBTable;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @DynamoDBTable(tableName = "EventData")
 public class MatchData {
-    private String team;
-    private String match;
+    private Integer team;
+    private Integer match;
     private String color;
     private Integer driverStation;
     private HashMap<String, Integer> autoHits;
@@ -37,15 +31,15 @@ public class MatchData {
     private Boolean redCard;
     private String notes;
 
-    @DynamoDBHashKey(attributeName = "Teams")
-    public String getTeam() { return team; }
-    void setTeam(final String _team) {
+    @DynamoDBHashKey(attributeName = "Team")
+    public Integer getTeam() { return team; }
+    void setTeam(final Integer _team) {
         this.team = _team;
     }
 
     @DynamoDBRangeKey (attributeName = "Match")
-    public String getMatch() { return match; }
-    void setMatch(final String _match) {
+    public Integer getMatch() { return match; }
+    void setMatch(final Integer _match) {
         this.match = _match;
     }
 

@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -29,14 +28,10 @@ import com.amazonaws.ClientConfiguration;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.Inet4Address;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
 import java.io.File;
 import java.io.FileOutputStream;
 
@@ -228,8 +223,8 @@ public class MainActivity extends AppCompatActivity {
     private MatchData returnMatch(int index) {
         final String[] DATA = DATA_FILES[index].split(",");
         MatchData matchData = new MatchData();
-        matchData.setTeam(DATA[0]);
-        matchData.setMatch(DATA[1]);
+        matchData.setTeam(Integer.valueOf(DATA[0]));
+        matchData.setMatch(Integer.valueOf(DATA[1]));
         matchData.setColor(DATA[2].toLowerCase());
         matchData.setDriverStation(Integer.valueOf(DATA[3]));
         final HashMap<String, Integer> AUTO_HITS = new HashMap<String, Integer>() {
