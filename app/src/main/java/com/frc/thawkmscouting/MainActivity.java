@@ -227,52 +227,53 @@ public class MainActivity extends AppCompatActivity {
         matchData.setMatch(Integer.valueOf(DATA[1]));
         matchData.setColor(DATA[2].toLowerCase());
         matchData.setDriverStation(Integer.valueOf(DATA[3]));
+        matchData.setCrossedLine(Boolean.valueOf(DATA[4]));
         final HashMap<String, Integer> AUTO_HITS = new HashMap<String, Integer>() {
             {
-                put("Inner", Integer.valueOf(DATA[4]));
-                put("Outer", Integer.valueOf(DATA[5]));
-                put("Bottom", Integer.valueOf(DATA[6]));
+                put("Inner", Integer.valueOf(DATA[5]));
+                put("Outer", Integer.valueOf(DATA[6]));
+                put("Bottom", Integer.valueOf(DATA[7]));
             }
         };
         matchData.setAutoHits(AUTO_HITS);
         final HashMap<String, Integer> AUTO_MISS = new HashMap<String, Integer>() {
             {
-                put("High", Integer.valueOf(DATA[7]));
-                put("Low", Integer.valueOf(DATA[8]));
+                put("High", Integer.valueOf(DATA[8]));
+                put("Low", Integer.valueOf(DATA[9]));
             }
         };
         matchData.setAutoMiss(AUTO_MISS);
-        matchData.setTimePlayingDefense(Integer.valueOf(DATA[9]));
-        matchData.setTimeDefenseOnTeam(Integer.valueOf(DATA[10]));
-        matchData.setPenalties(Integer.valueOf(DATA[11]));
+        matchData.setTimePlayingDefense(Integer.valueOf(DATA[10]));
+        matchData.setTimeDefenseOnTeam(Integer.valueOf(DATA[11]));
+        matchData.setPenalties(Integer.valueOf(DATA[12]));
         final HashMap<String, HashMap<String, Integer>> SCORING = new HashMap<>();
         for(int i = 0; i < 6; i++) {
             final int INDEX = i;
             final HashMap SCORING_MAP = new HashMap<String, Integer>() {
                 {
-                    put("Inner", Integer.valueOf(DATA[5*INDEX+12]));
-                    put("Outer", Integer.valueOf(DATA[5*INDEX+13]));
-                    put("Bottom", Integer.valueOf(DATA[5*INDEX+14]));
-                    put("High", Integer.valueOf(DATA[5*INDEX+15]));
-                    put("Low", Integer.valueOf(DATA[5*INDEX+16]));
+                    put("Inner", Integer.valueOf(DATA[5*INDEX+13]));
+                    put("Outer", Integer.valueOf(DATA[5*INDEX+14]));
+                    put("Bottom", Integer.valueOf(DATA[5*INDEX+15]));
+                    put("High", Integer.valueOf(DATA[5*INDEX+16]));
+                    put("Low", Integer.valueOf(DATA[5*INDEX+17]));
                 }
             };
             SCORING.put(String.format("Position: %d", INDEX), SCORING_MAP);
         }
         matchData.setScoring(SCORING);
-        matchData.setRotationControl(Boolean.valueOf(DATA[42]));
-        matchData.setColorControl(Boolean.valueOf(DATA[43]));
-        matchData.setAttemptedClimb(Boolean.valueOf(DATA[44]));
-        matchData.setClimb(Boolean.valueOf(DATA[45]));
-        matchData.setLevel(Boolean.valueOf(DATA[46]));
-        matchData.setAttemptedDoubleClimb(Boolean.valueOf(DATA[47]));
-        matchData.setDoubleClimb(Boolean.valueOf(DATA[48]));
-        matchData.setBrownedOut(Boolean.valueOf(DATA[49]));
-        matchData.setDisabled(Boolean.valueOf(DATA[50]));
-        matchData.setYellowCard(Boolean.valueOf(DATA[51]));
-        matchData.setRedCard(Boolean.valueOf(DATA[52]));
-        matchData.setName((DATA[53]));
-        matchData.setNotes((DATA[54]));
+        matchData.setRotationControl(Boolean.valueOf(DATA[43]));
+        matchData.setColorControl(Boolean.valueOf(DATA[44]));
+        matchData.setAttemptedClimb(Boolean.valueOf(DATA[45]));
+        matchData.setClimb(Boolean.valueOf(DATA[46]));
+        matchData.setLevel(Boolean.valueOf(DATA[47]));
+        matchData.setAttemptedDoubleClimb(Boolean.valueOf(DATA[48]));
+        matchData.setDoubleClimb(Boolean.valueOf(DATA[49]));
+        matchData.setBrownedOut(Boolean.valueOf(DATA[50]));
+        matchData.setDisabled(Boolean.valueOf(DATA[51]));
+        matchData.setYellowCard(Boolean.valueOf(DATA[52]));
+        matchData.setRedCard(Boolean.valueOf(DATA[53]));
+        matchData.setName((DATA[54]));
+        matchData.setNotes((DATA[55]));
         return matchData;
     }
 
@@ -287,52 +288,53 @@ public class MainActivity extends AppCompatActivity {
             JSONMap.put("Match", DATA[1]);
             JSONMap.put("Color", DATA[2].toLowerCase());
             JSONMap.put("Driver Station", Integer.valueOf(DATA[3]));
+            JSONMap.put("Crossed Line", Boolean.valueOf(DATA[4]));
             final HashMap<String, Integer> AUTO_HITS = new HashMap<String, Integer>() {
                 {
-                    put("Inner", Integer.valueOf(DATA[4]));
-                    put("Outer", Integer.valueOf(DATA[5]));
-                    put("Bottom", Integer.valueOf(DATA[6]));
+                    put("Inner", Integer.valueOf(DATA[5]));
+                    put("Outer", Integer.valueOf(DATA[6]));
+                    put("Bottom", Integer.valueOf(DATA[7]));
                 }
             };
             JSONMap.put("Auto Hits", AUTO_HITS);
             final HashMap<String, Integer> AUTO_MISS = new HashMap<String, Integer>() {
                 {
-                    put("High", Integer.valueOf(DATA[7]));
-                    put("Low", Integer.valueOf(DATA[8]));
+                    put("High", Integer.valueOf(DATA[8]));
+                    put("Low", Integer.valueOf(DATA[9]));
                 }
             };
             JSONMap.put("Auto Miss", AUTO_MISS);
-            JSONMap.put("Time Playing Defense", (Integer.valueOf(DATA[9])));
-            JSONMap.put("Time Defense On Team", (Integer.valueOf(DATA[9])));
-            JSONMap.put("Penalties", (Integer.valueOf(DATA[11])));
+            JSONMap.put("Time Playing Defense", (Integer.valueOf(DATA[10])));
+            JSONMap.put("Time Defense On Team", (Integer.valueOf(DATA[11])));
+            JSONMap.put("Penalties", (Integer.valueOf(DATA[12])));
             final HashMap<String, HashMap<String, Integer>> SCORING = new HashMap<>();
             for(int x = 0; x < 6; x++) {
                 final int INDEX = x;
                 final HashMap SCORING_MAP = new HashMap<String, Integer>() {
                     {
-                        put("Inner", Integer.valueOf(DATA[5*INDEX+12]));
-                        put("Outer", Integer.valueOf(DATA[5*INDEX+13]));
-                        put("Bottom", Integer.valueOf(DATA[5*INDEX+14]));
-                        put("High", Integer.valueOf(DATA[5*INDEX+15]));
-                        put("Low", Integer.valueOf(DATA[5*INDEX+16]));
+                        put("Inner", Integer.valueOf(DATA[5*INDEX+13]));
+                        put("Outer", Integer.valueOf(DATA[5*INDEX+14]));
+                        put("Bottom", Integer.valueOf(DATA[5*INDEX+15]));
+                        put("High", Integer.valueOf(DATA[5*INDEX+16]));
+                        put("Low", Integer.valueOf(DATA[5*INDEX+17]));
                     }
                 };
                 SCORING.put(String.format("Position: %d", INDEX), SCORING_MAP);
             }
             JSONMap.put("Scoring", SCORING);
-            JSONMap.put("Rotation Control", (Boolean.valueOf(DATA[42])));
-            JSONMap.put("Color Control", (Boolean.valueOf(DATA[43])));
-            JSONMap.put("Attempted CLimb", (Boolean.valueOf(DATA[44])));
-            JSONMap.put("Climb", (Boolean.valueOf(DATA[45])));
-            JSONMap.put("Level", (Boolean.valueOf(DATA[46])));
-            JSONMap.put("Attempted Double Climb", (Boolean.valueOf(DATA[47])));
-            JSONMap.put("Double Climb", (Boolean.valueOf(DATA[48])));
-            JSONMap.put("Browned Out", (Boolean.valueOf(DATA[49])));
-            JSONMap.put("Disabled", (Boolean.valueOf(DATA[50])));
-            JSONMap.put("Yellow Card", (Boolean.valueOf(DATA[51])));
-            JSONMap.put("Red Card", (Boolean.valueOf(DATA[52])));
+            JSONMap.put("Rotation Control", (Boolean.valueOf(DATA[43])));
+            JSONMap.put("Color Control", (Boolean.valueOf(DATA[44])));
+            JSONMap.put("Attempted CLimb", (Boolean.valueOf(DATA[45])));
+            JSONMap.put("Climb", (Boolean.valueOf(DATA[46])));
+            JSONMap.put("Level", (Boolean.valueOf(DATA[47])));
+            JSONMap.put("Attempted Double Climb", (Boolean.valueOf(DATA[48])));
+            JSONMap.put("Double Climb", (Boolean.valueOf(DATA[49])));
+            JSONMap.put("Browned Out", (Boolean.valueOf(DATA[50])));
+            JSONMap.put("Disabled", (Boolean.valueOf(DATA[51])));
+            JSONMap.put("Yellow Card", (Boolean.valueOf(DATA[52])));
+            JSONMap.put("Red Card", (Boolean.valueOf(DATA[53])));
             JSONMap.put("Scouter Name", (DATA[54]));
-            JSONMap.put("Notes", (DATA[54]));
+            JSONMap.put("Notes", (DATA[55]));
             JSON_ARRAY.put(new JSONObject(JSONMap));
         }
         try {

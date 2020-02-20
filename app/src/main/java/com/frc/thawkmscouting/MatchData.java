@@ -1,5 +1,7 @@
 package com.frc.thawkmscouting;
 
+import android.os.Build;
+
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBAttribute;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBHashKey;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBRangeKey;
@@ -13,6 +15,7 @@ public class MatchData {
     private Integer match;
     private String color;
     private Integer driverStation;
+    private Boolean crossedLine;
     private HashMap<String, Integer> autoHits;
     private HashMap<String, Integer> autoMiss;
     private Integer timePlayingDefense;
@@ -51,6 +54,10 @@ public class MatchData {
     @DynamoDBAttribute(attributeName = "Driver Station")
     public Integer getDriverStation() { return driverStation; }
     void setDriverStation(final Integer _driverStation) { this.driverStation = _driverStation; }
+
+    @DynamoDBAttribute(attributeName = "Crossed Line")
+    public Boolean getCrossedLine() { return crossedLine; }
+    void setCrossedLine(final Boolean _crossedLine) { this.crossedLine = _crossedLine; }
 
     @DynamoDBAttribute(attributeName = "Auto Hits")
     public HashMap<String, Integer> getAutoHits() { return autoHits; }
