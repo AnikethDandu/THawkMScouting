@@ -29,6 +29,7 @@ public class MatchData {
     private Boolean disabled;
     private Boolean yellowCard;
     private Boolean redCard;
+    private String name;
     private String notes;
 
     @DynamoDBHashKey(attributeName = "Team")
@@ -118,6 +119,10 @@ public class MatchData {
     @DynamoDBAttribute(attributeName = "Yellow Card")
     public boolean getYellowCard() { return yellowCard; }
     void setYellowCard(final boolean _yellowCard) { this.yellowCard = _yellowCard; }
+
+    @DynamoDBAttribute(attributeName = "Scouter Name")
+    public String getName() { return name; }
+    void setName(final String _name) { this.name = _name; }
 
     @DynamoDBAttribute(attributeName = "Notes")
     public String getNotes() { return notes; }

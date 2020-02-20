@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     final TextView[] FILE_LABELS = new TextView[6];
 
     /* REPLACE THIS WITH THE COGNITO USER POOL ID */
-    final String ID = "XXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+    final String ID = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     /* REPLACE THIS WITH THE REGION YOUR DATABASE IS SET UP IN */
     final Regions REGION = Regions.DEFAULT_REGION;
 
@@ -271,7 +271,8 @@ public class MainActivity extends AppCompatActivity {
         matchData.setDisabled(Boolean.valueOf(DATA[50]));
         matchData.setYellowCard(Boolean.valueOf(DATA[51]));
         matchData.setRedCard(Boolean.valueOf(DATA[52]));
-        matchData.setNotes((DATA[53]));
+        matchData.setName((DATA[53]));
+        matchData.setNotes((DATA[54]));
         return matchData;
     }
 
@@ -330,7 +331,8 @@ public class MainActivity extends AppCompatActivity {
             JSONMap.put("Disabled", (Boolean.valueOf(DATA[50])));
             JSONMap.put("Yellow Card", (Boolean.valueOf(DATA[51])));
             JSONMap.put("Red Card", (Boolean.valueOf(DATA[52])));
-            JSONMap.put("Notes", (DATA[53]));
+            JSONMap.put("Scouter Name", (DATA[54]));
+            JSONMap.put("Notes", (DATA[54]));
             JSON_ARRAY.put(new JSONObject(JSONMap));
         }
         try {
