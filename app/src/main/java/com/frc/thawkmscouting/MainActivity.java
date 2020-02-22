@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -116,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                     if (DATA_FILES[index - 1] != null) {
                         FILE_LABELS[index - 1].setText(String.format("%s", "Empty"));
                         DATA_FILES[index - 1] = null;
-                        FILE_LABELS[index-1].setTextColor(getResources().getColor(R.color.gray));
+                        FILE_LABELS[index-1].setTextColor(Color.WHITE);
                         break;
                     }
                 }
