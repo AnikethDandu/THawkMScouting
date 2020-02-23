@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">T-Hawk Master Scouting 2020</string>
-    <string name="default_qr_slot">Empty</string>
+    <string name="text_empty_qr_slot">Empty</string>
+    <string name="text_scan_qr">scan qr</string>
+    <string name="text_remove_qr">remove qr code</string>
+    <string name="text_export">export data</string>
 </resources>

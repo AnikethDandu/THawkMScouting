@@ -3,10 +3,10 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
-    <color name ="allianceBlue">#47B5FF</color>
-    <color name ="allianceRed">#F56969</color>
-    <color name="gray">#5A5A5A</color>
+    <color name="allianceBlue">#47B5FF</color>
+    <color name="allianceRed">#F56969</color>
     <color name="maroon">#42151D</color>
-    <color name="backgroundDark">#313131</color>
+    <color name="darkMaroon">#27050C</color>
+    <color name="gray">#313131</color>
     <color name="infiniteRechargeBlue">#0A4E97</color>
 </resources>

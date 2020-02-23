@@ -1,17 +1,17 @@
 package com.frc.thawkmscouting;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Bundle;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import android.content.pm.PackageManager;
-
+import android.graphics.Color;
 import android.os.Environment;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -21,60 +21,80 @@ import com.amazonaws.regions.Regions;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import com.amazonaws.ClientConfiguration;
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.client.AWSStartupHandler;
 import com.amazonaws.mobile.client.AWSStartupResult;
-
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.regions.Region;
-import com.amazonaws.ClientConfiguration;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.HashMap;
+import java.io.IOException;
+import java.util.Map;
+import java.io.PrintWriter;
 
-/**q
- * Combines data from 6 QR codes and pushes the data to AWS
+/**
+ * Reads 6 QR codes, pushes the data to DynamoDB, and stores the data locally in JSON format
  *
  * @author Aniketh Dandu - Team 1100
  */
 public class MainActivity extends AppCompatActivity {
 
-    /* The data from the six QR codes */
-    final String[] DATA_FILES = new String[6];
-    /* The labels for the six files */
-    final TextView[] FILE_LABELS = new TextView[6];
-
-    /* REPLACE THIS WITH THE COGNITO USER POOL ID */
-    final String ID = "REPLACE_ME_WITH_THE_COGNITO_POOL_ID";
-    /* REPLACE THIS WITH THE REGION YOUR DATABASE IS SET UP IN */
-    final Regions REGION = Regions.DEFAULT_REGION;
-
+    /**
+     * Permission integer to write to external storage
+     */
     private static final int MY_PERMISSION_WRITE_EXTERNAL_STORAGE = 1;
-
-    DynamoDBMapper dynamoDBMapper;
+    /**
+     * The Tag for Logging from this class
+     */
+    private static final String TAG = MainActivity.class.getSimpleName();
+    /**
+     * An array of Strings holding data from each QR code
+     */
+    private final String[] DATA_FILES = new String[6];
+    /**
+     * The labels corresponding to each QR code
+     */
+    private final TextView[] FILE_LABELS = new TextView[6];
+    /**
+     * The Cognito Pool ID (Needs to be replaced with the ID from an AWS account)
+     */
+    private final String ID = "REPLACE_ME_WITH_THE_COGNITO_POOL_ID";
+    /**
+     * The region the AWS account is in (needs to be replaced)
+     */
+    private final Regions REGION = Regions.DEFAULT_REGION;
+    /**
+     * The object mapper for DynamoDB
+     */
+    private DynamoDBMapper m_dynamoDBMapper;
 
     /**
-     * Set the UI elements and the button listeners
+     * Set the UI elements and the btn_scan_qr listeners
      *
      * @param savedInstanceState The instance of the screen
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        /* Create the screen and set te view */
+        // Create the screen and set te view
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        new File((Environment.getExternalStorageDirectory().getAbsolutePath() + "/THawkScouting")).mkdir();
+        // Make a directory to store for the JSON files and log the result
+        if(new File((Environment.getExternalStorageDirectory().getAbsolutePath() + "/THawkScouting")).mkdir()) {
+            Log.i(TAG, "Directory successfully created");
+        } else {
+            Log.w(TAG, "Directory not created");
+        }
 
+        // Request permissions to write to external storage
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -83,18 +103,24 @@ public class MainActivity extends AppCompatActivity {
                     MY_PERMISSION_WRITE_EXTERNAL_STORAGE);
         }
 
+        // Initialize an AWS Mobile Client
         AWSMobileClient.getInstance().initialize(this, new AWSStartupHandler() {
 
+            /**
+             * Uses permissions from AWS Cognito and creates a DynamoDB Client and object mapper
+             * @param awsStartupResult The result from initializing the AWS client
+             */
             @Override
             public void onComplete(AWSStartupResult awsStartupResult) {
 
+                // Get permissions from Cognito using the User Pool ID and region
                 CognitoCachingCredentialsProvider cognitoCachingCredentialsProvider = new CognitoCachingCredentialsProvider(
                         getApplicationContext(),
                         ID,
                         REGION
                 );
 
-                // Add code to instantiate a AmazonDynamoDBClient
+                // Instantiate a AmazonDynamoDBClient using the permissions
                 AmazonDynamoDBClient ddbClient = Region.getRegion(REGION)
                         .createClient(
                                 AmazonDynamoDBClient.class,
@@ -102,7 +128,8 @@ public class MainActivity extends AppCompatActivity {
                                 new ClientConfiguration()
                         );
 
-                dynamoDBMapper = DynamoDBMapper.builder()
+                // Create the DynamoDB object mapper
+                m_dynamoDBMapper = DynamoDBMapper.builder()
                         .dynamoDBClient(ddbClient)
                         .awsConfiguration(
                                 AWSMobileClient.getInstance().getConfiguration())
@@ -111,21 +138,16 @@ public class MainActivity extends AppCompatActivity {
             }
         }).execute();
 
-        /* ID the labels displaying the file names */
-        FILE_LABELS[0] = findViewById(R.id.textView);
-        FILE_LABELS[1] = findViewById(R.id.textView2);
-        FILE_LABELS[2] = findViewById(R.id.textView3);
-        FILE_LABELS[3] = findViewById(R.id.textView4);
-        FILE_LABELS[4] = findViewById(R.id.textView5);
-        FILE_LABELS[5] = findViewById(R.id.textView6);
+        // ID the labels displaying the file names
+        FILE_LABELS[0] = findViewById(R.id.main_text_qr_1);
+        FILE_LABELS[1] = findViewById(R.id.main_text_qr_2);
+        FILE_LABELS[2] = findViewById(R.id.main_text_qr_3);
+        FILE_LABELS[3] = findViewById(R.id.main_text_qr_4);
+        FILE_LABELS[4] = findViewById(R.id.main_text_qr_5);
+        FILE_LABELS[5] = findViewById(R.id.main_text_qr_6);
 
-        /* At the start, set all the text to "Empty" */
-        for (TextView text : FILE_LABELS) {
-            text.setText(String.format("%s", "Empty"));
-        }
-
-        /* When the subtract button is clicked, remove the last slot and file label text */
-        final Button REMOVE_BUTTON = findViewById(R.id.removeButton);
+        // When the remove button is clicked, remove the last QR code scanned
+        final Button REMOVE_BUTTON = findViewById(R.id.main_button_remove_qr);
         REMOVE_BUTTON.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -140,8 +162,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /* When the export button is clicked, push the data to AWS */
-        final Button EXPORT_BUTTON = findViewById(R.id.exportButton);
+        // When the export button is clicked, push the data to AWS */
+        final Button EXPORT_BUTTON = findViewById(R.id.main_button_export);
         EXPORT_BUTTON.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -149,7 +171,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        final Button SCAN_BUTTON = findViewById(R.id.scanButton);
+        // When the scan button is pressed, scan the QR code
+        final Button SCAN_BUTTON = findViewById(R.id.main_button_scan_qr);
         SCAN_BUTTON.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -160,87 +183,88 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Update the arrays holding the file name and file data
+     * Update the String holding the QR code data and the corresponding label
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        /* The result from scanning the QR */
+        // The result from scanning the QR code
         final IntentResult RESULT = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        /* If data is present, proceed */
         if (RESULT != null) {
-            /* If the QR code has no data */
+            // If the QR code has no data, notify the user
             if (RESULT.getContents() == null) {
-                /* Notify the user that data was not scanned */
                 Toast.makeText(MainActivity.this, "No data in QR code", Toast.LENGTH_LONG).show();
             } else {
-                /* if QR contains data, modify the arrays */
-                /* If the last slot is empty, then at least one slot can be filled */
+                /* if QR contains data, update the label and store the data in a String
+                If the last slot is empty, then at least one slot can be filled */
                 if (DATA_FILES[5] == null) {
-                    /* Loop through the data slots */
                     for(int i = 0; i < 6; i++) {
-                        /* If a data slot is empty, put the data in that slot */
                         if (DATA_FILES[i] == null) {
-                            /* Grab the data from the QR code */
+                            // Update the String holding the data
                             DATA_FILES[i] = RESULT.getContents();
-                            /* Split the data into an array */
+                            // Update the label with the color, team, and match
                             String[] DATA_ARRAY = DATA_FILES[i].split(",");
-                            /* Determine the correct color corresponding to that team */
                             final int COLOR = DATA_ARRAY[2].toLowerCase().equals("red")
                                     ? getResources().getColor(R.color.allianceRed)
                                     : getResources().getColor(R.color.allianceBlue);
-                            /* Set the label text color the corresponding color (for the user) */
                             FILE_LABELS[i].setTextColor(COLOR);
-                            /* Set the label to the corresponding team and match */
                             FILE_LABELS[i].setText(String.format("Match %s: %s", DATA_ARRAY[1], DATA_ARRAY[0]));
-                            /* Break so only one data slot is filled */
+                            // Break so only one data slot is filled
                             break;
                         }
                     }
                 } else {
-                    /* If a slot is not open, notify the user */
+                    // If a slot is not open, notify the user
                     Toast.makeText(MainActivity.this, "Already have 6 files\n Please remove a file", Toast.LENGTH_LONG).show();
                 }
             }
         } else {
-            /* If the QR scan fails */
+            // If the QR scan fails
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
     /**
-     * Upload data to AWS
+     * Upload data to AWS and save locally in a JSON file
      */
     private void uploadData() {
         try {
-            /* Loop through the six strings of data */
+            // Loop through the six strings of data
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     exportJSON();
-                    System.out.println("EXPORTED JSON FILE MAYBE?");
-                    //  Toast.makeText(getApplicationContext(), "JSON file updated", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "JSON file updated", Toast.LENGTH_SHORT).show();
                     for(int i = 0; i < 6; i++) {
-                        dynamoDBMapper.save(returnMatch(i));
+                        m_dynamoDBMapper.save(returnMatch(i));
                     }
                 }
             }).start();
 
             Toast.makeText(getApplicationContext(), "Database updated", Toast.LENGTH_LONG).show();
         }
-        /* Display error message if user did not scan six QR codes */
+        // Display error message if user did not scan six QR codes
         catch (NullPointerException e) {
             Toast.makeText(getApplicationContext(), "One or more empty data slots. Please scan all 6 QR codes", Toast.LENGTH_LONG).show();
         }
-        /* Display an error message for any other error */
+        // Display an error message for any other error
         catch (Exception e) {
             Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
+    /**
+     *
+     * @param index The index of the array of the team's data used to push to AWS
+     * @return Return an instance of the MatchData schema class
+     */
+    @SuppressWarnings("unchecked")
     @SuppressLint("DefaultLocale")
     private MatchData returnMatch(int index) {
+        // Split the data into a String array
         final String[] DATA = DATA_FILES[index].split(",");
+        // Create the instance of the MatchData class
         MatchData matchData = new MatchData();
+        // Set all the required data fields
         matchData.setTeam(Integer.valueOf(DATA[0]));
         matchData.setMatch(Integer.valueOf(DATA[1]));
         matchData.setColor(DATA[2].toLowerCase());
@@ -295,15 +319,24 @@ public class MainActivity extends AppCompatActivity {
         return matchData;
     }
 
+    /**
+     * Turn the data in the String into a JSON object
+     * Group all 6 JSON objects into a JSON array
+     * Write the JSON array to a file
+     */
+    @SuppressWarnings("unchecked")
     @SuppressLint("DefaultLocale")
     private void exportJSON() {
+        // Get the match (will be the same for all QR codes)
         final String MATCH = DATA_FILES[0].split(",")[1];
+        // Create the array
         final JSONArray JSON_ARRAY = new JSONArray();
+        // Create 6 JSON objects corresponding to each team's data
         for(int i = 0; i < 6; i++) {
             Map<String, Object> JSONMap = new HashMap<>();
             final String[] DATA = DATA_FILES[i].split(",");
-            JSONMap.put("Team", DATA[0]);
-            JSONMap.put("Match", DATA[1]);
+            JSONMap.put("Team", Integer.valueOf(DATA[0]));
+            JSONMap.put("Match", Integer.valueOf(MATCH));
             JSONMap.put("Color", DATA[2].toLowerCase());
             JSONMap.put("Driver Station", Integer.valueOf(DATA[3]));
             JSONMap.put("Crossed Line", Boolean.valueOf(DATA[4]));
@@ -353,22 +386,24 @@ public class MainActivity extends AppCompatActivity {
             JSONMap.put("Red Card", (Boolean.valueOf(DATA[53])));
             JSONMap.put("Scouter Name", (DATA[54]));
             JSONMap.put("Notes", (DATA[55]));
+            // Put the JSON object into the JSON array
             JSON_ARRAY.put(new JSONObject(JSONMap));
         }
+        // Write the JSON array to a text file in internal storage
         try {
-            final File JSON_FILE = new File(("storage/emulated/0/THawkScouting"), (MATCH + ".txt"));
-            System.out.println(JSON_ARRAY.toString());
+            final File JSON_FILE = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "THawkScouting", (MATCH + ".txt"));
             final PrintWriter PRINT_WRITER = new PrintWriter(new FileOutputStream(JSON_FILE, false));
             PRINT_WRITER.println(JSON_ARRAY.toString(0));
             PRINT_WRITER.flush();
             PRINT_WRITER.close();
         }
+        // Display the JSON error to the user with the prefix JSON error:
         catch (org.json.JSONException e) {
             Toast.makeText(getApplicationContext(), "JSON error: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
+        // Display any other exception to the user
         catch (IOException e) {
-            System.out.println("IOE: " + e.getMessage());
-//            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 }
