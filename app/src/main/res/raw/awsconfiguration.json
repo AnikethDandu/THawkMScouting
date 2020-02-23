@@ -1,19 +1,21 @@
 {
   "Version": "1.0",
-  "DynamoDBObjectMapper" : {
-    "Default" : {
-      "Region" : "XXXXXXXXX"
-    }
-  },
-  "IdentityManager": {
-    "Default": {}
-  },
   "CredentialsProvider": {
     "CognitoIdentity": {
       "Default": {
-        "PoolId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-        "Region": "XXXXXXXX"
+        "PoolId": "XX-XXXXX-X-XXXXXXXXXXXXXXXXXXXXXXX",
+        "Region": "XX-XXXXX-X"
       }
+    }
+  },
+  "DynamoDBObjectMapper" : {
+    "Default" : {
+      "Region" : "XX-XXXXX-X"
+    }
+  },
+  "IdentityManager": {
+    "Default": {
+
     }
   }
 }

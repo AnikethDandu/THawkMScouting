@@ -2,10 +2,15 @@ package com.frc.thawkmscouting;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import android.content.pm.PackageManager;
+
 import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
@@ -49,9 +54,11 @@ public class MainActivity extends AppCompatActivity {
     final TextView[] FILE_LABELS = new TextView[6];
 
     /* REPLACE THIS WITH THE COGNITO USER POOL ID */
-    final String ID = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+    final String ID = "REPLACE_ME_WITH_THE_COGNITO_POOL_ID";
     /* REPLACE THIS WITH THE REGION YOUR DATABASE IS SET UP IN */
     final Regions REGION = Regions.DEFAULT_REGION;
+
+    private static final int MY_PERMISSION_WRITE_EXTERNAL_STORAGE = 1;
 
     DynamoDBMapper dynamoDBMapper;
 
@@ -62,10 +69,19 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         /* Create the screen and set te view */
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        new File((Environment.getExternalStorageDirectory().getAbsolutePath() + "/THawkScouting")).mkdir();
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    MY_PERMISSION_WRITE_EXTERNAL_STORAGE);
+        }
 
         AWSMobileClient.getInstance().initialize(this, new AWSStartupHandler() {
 
@@ -170,8 +186,8 @@ public class MainActivity extends AppCompatActivity {
                             String[] DATA_ARRAY = DATA_FILES[i].split(",");
                             /* Determine the correct color corresponding to that team */
                             final int COLOR = DATA_ARRAY[2].toLowerCase().equals("red")
-                                    ? getResources().getColor(R.color.red)
-                                    : getResources().getColor(R.color.blue);
+                                    ? getResources().getColor(R.color.allianceRed)
+                                    : getResources().getColor(R.color.allianceBlue);
                             /* Set the label text color the corresponding color (for the user) */
                             FILE_LABELS[i].setTextColor(COLOR);
                             /* Set the label to the corresponding team and match */
@@ -197,22 +213,23 @@ public class MainActivity extends AppCompatActivity {
     private void uploadData() {
         try {
             /* Loop through the six strings of data */
-            exportJSON();
-            Toast.makeText(MainActivity.this, "JSON file updated", Toast.LENGTH_SHORT).show();
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    exportJSON();
+                    System.out.println("EXPORTED JSON FILE MAYBE?");
+                    //  Toast.makeText(getApplicationContext(), "JSON file updated", Toast.LENGTH_SHORT).show();
                     for(int i = 0; i < 6; i++) {
                         dynamoDBMapper.save(returnMatch(i));
                     }
                 }
             }).start();
 
-            Toast.makeText(MainActivity.this, "Database updated", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Database updated", Toast.LENGTH_LONG).show();
         }
         /* Display error message if user did not scan six QR codes */
         catch (NullPointerException e) {
-            Toast.makeText(MainActivity.this, "One or more empty data slots. Please scan all 6 QR codes", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "One or more empty data slots. Please scan all 6 QR codes", Toast.LENGTH_LONG).show();
         }
         /* Display an error message for any other error */
         catch (Exception e) {
@@ -285,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 0; i < 6; i++) {
             Map<String, Object> JSONMap = new HashMap<>();
             final String[] DATA = DATA_FILES[i].split(",");
-            JSONMap.put("Teams", DATA[0]);
+            JSONMap.put("Team", DATA[0]);
             JSONMap.put("Match", DATA[1]);
             JSONMap.put("Color", DATA[2].toLowerCase());
             JSONMap.put("Driver Station", Integer.valueOf(DATA[3]));
@@ -339,7 +356,8 @@ public class MainActivity extends AppCompatActivity {
             JSON_ARRAY.put(new JSONObject(JSONMap));
         }
         try {
-            final File JSON_FILE = new File((Environment.getExternalStorageDirectory() + "/THawkScouting"), (MATCH + ".txt"));
+            final File JSON_FILE = new File(("storage/emulated/0/THawkScouting"), (MATCH + ".txt"));
+            System.out.println(JSON_ARRAY.toString());
             final PrintWriter PRINT_WRITER = new PrintWriter(new FileOutputStream(JSON_FILE, false));
             PRINT_WRITER.println(JSON_ARRAY.toString(0));
             PRINT_WRITER.flush();
@@ -349,7 +367,8 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "JSON error: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
         catch (IOException e) {
-            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            System.out.println("IOE: " + e.getMessage());
+//            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 }
