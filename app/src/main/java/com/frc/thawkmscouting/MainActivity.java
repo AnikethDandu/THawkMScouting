@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * The Cognito Pool ID (Needs to be replaced with the ID from an AWS account)
      */
-    private final String ID = "REPLACE_ME_WITH_THE_COGNITO_POOL_ID";
+    private final String ID = "REPLACE_ME_WITH_COGNITO_USER_POOL_ID";
     /**
      * The region the AWS account is in (needs to be replaced)
      */
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Make a directory to store for the JSON files and log the result
-        if(new File((Environment.getExternalStorageDirectory().getAbsolutePath() + "/THawkScouting")).mkdir()) {
+        if(new File((Environment.getExternalStorageDirectory() + "/THawkScouting")).mkdirs()) {
             Log.i(TAG, "Directory successfully created");
         } else {
             Log.w(TAG, "Directory not created");
@@ -228,12 +228,13 @@ public class MainActivity extends AppCompatActivity {
      */
     private void uploadData() {
         try {
+            // Export the JSON file to internal storage
+            exportJSON();
+            Toast.makeText(getApplicationContext(), "JSON file updated", Toast.LENGTH_SHORT).show();
             // Loop through the six strings of data
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    exportJSON();
-                    Toast.makeText(getApplicationContext(), "JSON file updated", Toast.LENGTH_SHORT).show();
                     for(int i = 0; i < 6; i++) {
                         m_dynamoDBMapper.save(returnMatch(i));
                     }
@@ -391,7 +392,8 @@ public class MainActivity extends AppCompatActivity {
         }
         // Write the JSON array to a text file in internal storage
         try {
-            final File JSON_FILE = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "THawkScouting", (MATCH + ".txt"));
+            final File JSON_FILE = new File(Environment.getExternalStorageDirectory() + "/THawkScouting", (MATCH + ".txt"));
+            Log.d(TAG, String.valueOf(JSON_FILE.exists()));
             final PrintWriter PRINT_WRITER = new PrintWriter(new FileOutputStream(JSON_FILE, false));
             PRINT_WRITER.println(JSON_ARRAY.toString(0));
             PRINT_WRITER.flush();
