@@ -4,13 +4,13 @@
     "CognitoIdentity": {
       "Default": {
         "PoolId": "REPLACE_ME_WITH_COGNITO_USER_POOL_ID",
-        "Region": "REPLACE_ME_WITH_REGION"
+        "Region": "DEFAULT_REGION"
       }
     }
   },
   "DynamoDBObjectMapper" : {
     "Default" : {
-      "Region" : "REPLACE_ME_WITH_REGION"
+      "Region" : "DEFAULT_REGION"
     }
   },
   "IdentityManager": {

@@ -10,7 +10,7 @@ import java.util.HashMap;
 /**
  * The schema file in the form of a class used to format data before pushing to AWS
  */
-@DynamoDBTable(tableName = "EventData")
+@DynamoDBTable(tableName = "WeekOne")
 public class MatchData {
     private Integer m_team;
     private Integer m_match;

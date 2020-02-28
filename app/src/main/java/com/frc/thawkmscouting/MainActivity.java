@@ -247,11 +247,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }).start();
+                Toast.makeText(getApplicationContext(), "Database updated", Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(getApplicationContext(), "Cannot upload to DynamoDB no Wi-Fi | JSON File updated", Toast.LENGTH_LONG).show();
             }
-
-            Toast.makeText(getApplicationContext(), "Database updated", Toast.LENGTH_LONG).show();
         }
         // Display error message if user did not scan six QR codes
         catch (NullPointerException e) {
