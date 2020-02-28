@@ -6,9 +6,12 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Environment;
 import android.os.Bundle;
 import android.util.Log;
@@ -88,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Make a directory to store for the JSON files and log the result
-        if(new File((Environment.getExternalStorageDirectory() + "/THawkScouting")).mkdirs()) {
+        if (new File((Environment.getExternalStorageDirectory() + "/THawkScouting")).mkdirs()) {
             Log.i(TAG, "Directory successfully created");
         } else {
             Log.w(TAG, "Directory not created");
@@ -231,15 +234,22 @@ public class MainActivity extends AppCompatActivity {
             // Export the JSON file to internal storage
             exportJSON();
             Toast.makeText(getApplicationContext(), "JSON file updated", Toast.LENGTH_SHORT).show();
-            // Loop through the six strings of data
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    for(int i = 0; i < 6; i++) {
-                        m_dynamoDBMapper.save(returnMatch(i));
+            final ConnectivityManager CONNECTIVITY_MANAGER = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            final NetworkInfo NETWORK_INFO = CONNECTIVITY_MANAGER.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+            if (NETWORK_INFO.isConnected()) {
+                // Loop through the six strings of data
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for(int i = 0; i < 6; i++) {
+                            m_dynamoDBMapper.save(returnMatch(i));
+                        }
                     }
-                }
-            }).start();
+                }).start();
+            } else {
+                Toast.makeText(getApplicationContext(), "Cannot upload to DynamoDB no Wi-Fi | JSON File updated", Toast.LENGTH_LONG).show();
+            }
 
             Toast.makeText(getApplicationContext(), "Database updated", Toast.LENGTH_LONG).show();
         }
