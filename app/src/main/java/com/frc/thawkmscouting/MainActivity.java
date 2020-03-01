@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * The Cognito Pool ID (Needs to be replaced with the ID from an AWS account)
      */
-    private final String ID = "REPLACE_ME_WITH_COGNITO_USER_POOL_ID";
+    private final String ID = "REPLACE_ME_WITH_COGNITO_USER_POOL";
     /**
      * The region the AWS account is in (needs to be replaced)
      */
@@ -149,17 +150,34 @@ public class MainActivity extends AppCompatActivity {
         FILE_LABELS[4] = findViewById(R.id.main_text_qr_5);
         FILE_LABELS[5] = findViewById(R.id.main_text_qr_6);
 
+        final EditText REMOVE_NUMBER_TEXT = findViewById(R.id.remove_number);
+        REMOVE_NUMBER_TEXT.setText("0");
+
         // When the remove button is clicked, remove the last QR code scanned
         final Button REMOVE_BUTTON = findViewById(R.id.main_button_remove_qr);
         REMOVE_BUTTON.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                for (int index = 6; index > 0; index--) {
-                    if (DATA_FILES[index - 1] != null) {
-                        FILE_LABELS[index - 1].setText(String.format("%s", "Empty"));
-                        DATA_FILES[index - 1] = null;
-                        FILE_LABELS[index-1].setTextColor(Color.WHITE);
-                        break;
+            public void onClick(View view)   {
+                // Store the index of the QR code the user wants to remove
+                final int REMOVE_NUMBER = (REMOVE_NUMBER_TEXT.getText().toString().equals("")) ?
+                        0
+                        :  Integer.valueOf(REMOVE_NUMBER_TEXT.getText().toString()) - 1;
+                // If the index is from 0 to 5, remove that QR code
+                if (REMOVE_NUMBER <= 5 && REMOVE_NUMBER >= 0) {
+                    if (DATA_FILES[REMOVE_NUMBER] != null) {
+                        FILE_LABELS[REMOVE_NUMBER].setText(String.format("%s", "Empty"));
+                        DATA_FILES[REMOVE_NUMBER] = null;
+                        FILE_LABELS[REMOVE_NUMBER].setTextColor(Color.WHITE);
+                    }
+                    // If the index is 0, remove the last QR code entered
+                } else if (REMOVE_NUMBER == -1) {
+                    for (int i = 5; i > -1; i--) {
+                        if (DATA_FILES[i] != null) {
+                            FILE_LABELS[i].setText(String.format("%s", "Empty"));
+                            DATA_FILES[i] = null;
+                            FILE_LABELS[i].setTextColor(Color.WHITE);
+                            break;
+                        }
                     }
                 }
             }
@@ -197,11 +215,19 @@ public class MainActivity extends AppCompatActivity {
             if (RESULT.getContents() == null) {
                 Toast.makeText(MainActivity.this, "No data in QR code", Toast.LENGTH_LONG).show();
             } else {
-                /* if QR contains data, update the label and store the data in a String
-                If the last slot is empty, then at least one slot can be filled */
-                if (DATA_FILES[5] == null) {
+                // If QR contains data, update the label and store the data in a String
+                // Check if slot is open
+                boolean slotOpen = false;
+                for (int s = 0; s < 6; s++) {
+                    if (DATA_FILES[s] == null || DATA_FILES[s].equals("")) {
+                        slotOpen = true;
+                        break;
+                    }
+                }
+                // If the slot is open, add the QR data to the array
+                if (slotOpen) {
                     for(int i = 0; i < 6; i++) {
-                        if (DATA_FILES[i] == null) {
+                        if (DATA_FILES[i] == null || DATA_FILES[i].equals("")) {
                             // Update the String holding the data
                             DATA_FILES[i] = RESULT.getContents();
                             // Update the label with the color, team, and match
@@ -347,6 +373,7 @@ public class MainActivity extends AppCompatActivity {
             final String[] DATA = DATA_FILES[i].split(",");
             JSONMap.put("Team", Integer.valueOf(DATA[0]));
             JSONMap.put("Match", Integer.valueOf(MATCH));
+
             JSONMap.put("Color", DATA[2].toLowerCase());
             JSONMap.put("Driver Station", Integer.valueOf(DATA[3]));
             JSONMap.put("Crossed Line", Boolean.valueOf(DATA[4]));

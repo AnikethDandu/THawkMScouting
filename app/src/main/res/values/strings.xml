@@ -4,4 +4,5 @@
     <string name="text_scan_qr">scan qr</string>
     <string name="text_remove_qr">remove qr code</string>
     <string name="text_export">export data</string>
+    <string name="text_zero">0</string>
 </resources>
