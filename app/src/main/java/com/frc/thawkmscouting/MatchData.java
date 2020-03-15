@@ -10,7 +10,7 @@ import java.util.HashMap;
 /**
  * The schema file in the form of a class used to format data before pushing to AWS
  */
-@DynamoDBTable(tableName = "ENTER_TABLE_NAME")
+@DynamoDBTable(tableName = BuildConfig.TABLENAME)
 class MatchData {
     private int m_team;
     private int m_match;

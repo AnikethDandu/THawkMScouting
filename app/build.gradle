@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
 android {
+    viewBinding.enabled = true
     compileSdkVersion 29
     buildToolsVersion "29.0.1"
     defaultConfig {
@@ -16,6 +17,14 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "ID", "\"xxx\""
+            buildConfigField "String", "REGION", "\"xxx\""
+            buildConfigField "String", "TABLE_NAME", "\"xxx\""
+        }
+        debug {
+            buildConfigField "String", "ID", "\"xxx\""
+            buildConfigField "String", "REGION", "\"xx-xxx-x\""
+            buildConfigField "String", "TABLENAME", "\"xxx\""
         }
     }
     compileOptions {
@@ -34,6 +43,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'com.journeyapps:zxing-android-embedded:3.2.0@aar'
     implementation 'com.google.zxing:core:3.2.1'
-    implementation ('com.amazonaws:aws-android-sdk-mobile-client:2.7.+@aar') { transitive = true }
+    implementation ('com.amazonaws:aws-android-sdk-mobile-client:2.7.7') { transitive = true }
     implementation 'com.amazonaws:aws-android-sdk-ddb-mapper:2.7.7'
 }

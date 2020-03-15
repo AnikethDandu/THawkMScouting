@@ -253,6 +253,7 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline11"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/main_button_remove_qr"
-        app:layout_constraintTop_toTopOf="@+id/guideline14" />
+        app:layout_constraintTop_toTopOf="@+id/guideline14"
+        android:autofillHints=""/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
