@@ -5,4 +5,9 @@
     <string name="text_remove_qr">remove qr code</string>
     <string name="text_export">export data</string>
     <string name="text_zero">0</string>
+    <string name="error_empty_qr">No data in QR code</string>
+    <string name="error_overflow_qr">Already have 6 Qr codes. Please remove a QR code</string>
+    <string name="error_less_than_6_qr">One or more empty data slots. Please scan all 6 QR codes</string>
+    <string name="text_wifi_updated">JSON file updated | DynamoDB updated</string>
+    <string name="text_no_wifi_updated">Cannot upload to DynamoDB no Wi-Fi | JSON File updated</string>
 </resources>

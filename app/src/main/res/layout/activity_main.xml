@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/gray"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:screenOrientation="portrait">
 
     <Button
         android:id="@+id/main_button_scan_qr"
@@ -239,7 +240,7 @@
         app:layout_constraintGuide_percent="0.75" />
 
     <EditText
-        android:id="@+id/remove_number"
+        android:id="@+id/main_button_remove_index"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:gravity="center"
@@ -252,6 +253,6 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline11"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/main_button_remove_qr"
-        app:layout_constraintTop_toTopOf="@+id/guideline14"/>
+        app:layout_constraintTop_toTopOf="@+id/guideline14" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

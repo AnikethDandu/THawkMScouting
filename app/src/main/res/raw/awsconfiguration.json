@@ -3,14 +3,14 @@
   "CredentialsProvider": {
     "CognitoIdentity": {
       "Default": {
-        "PoolId": "REPLACE_ME_WITH_COGNITO_USER_POOL_ID",
-        "Region": "REPLACE_ME_WITH_REGION"
+        "PoolId": "REPLACE_ME_WITH_COGNITO_POOL_ID",
+        "Region": "default-region"
       }
     }
   },
   "DynamoDBObjectMapper" : {
     "Default" : {
-      "Region" : "REPLACE_ME_WITH_REGION"
+      "Region" : "default-region"
     }
   },
   "IdentityManager": {
