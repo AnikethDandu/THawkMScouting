@@ -17,14 +17,24 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "ID", "\"xxx\""
-            buildConfigField "String", "REGION", "\"xxx\""
-            buildConfigField "String", "TABLE_NAME", "\"xxx\""
+            try {
+                buildConfigField "String", "ID", ID
+                buildConfigField "String", "REGION", REGION
+                buildConfigField "String", "TABLE_NAME", TABLE_NAME
+            }
+            catch (ignored) {
+                throw new InvalidUserDataException("Define ID, REGION, and TABLE_NAME in gradle.properties.")
+            }
         }
         debug {
-            buildConfigField "String", "ID", "\"xxx\""
-            buildConfigField "String", "REGION", "\"xx-xxx-x\""
-            buildConfigField "String", "TABLENAME", "\"xxx\""
+            try {
+                buildConfigField "String", "ID", ID
+                buildConfigField "String", "REGION", REGION
+                buildConfigField "String", "TABLE_NAME", TABLE_NAME
+            }
+            catch (ignored) {
+                throw new InvalidUserDataException("Define ID, REGION, and TABLE_NAME in gradle.properties.")
+            }
         }
     }
     compileOptions {

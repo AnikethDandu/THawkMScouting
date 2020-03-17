@@ -8,7 +8,9 @@ import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBTable;
 import java.util.HashMap;
 
 /**
- * The schema file in the form of a class used to format data before pushing to AWS
+ * The schema file used to format data before pushing to AWS
+ *
+ * @author Aniketh Dandu - FRC Team 1100
  */
 @DynamoDBTable(tableName = BuildConfig.TABLENAME)
 class MatchData {
@@ -36,99 +38,231 @@ class MatchData {
     private String m_name;
     private String m_notes;
 
-    @DynamoDBHashKey(attributeName = "Team")
-    public int getTeam() { return m_team; }
-    void setTeam(final int _team) { this.m_team = _team; }
+    // **************************************************
+    // Set methods
+    // **************************************************
 
-    @DynamoDBRangeKey (attributeName = "Match")
-    public int getMatch() { return m_match; }
-    void setMatch(final int _match) { this.m_match = _match; }
+    // All set methods used to set a value in the MatchData object
+
+    void setTeam(final int _team) {
+        this.m_team = _team;
+    }
+
+    void setMatch(final int _match) {
+        this.m_match = _match;
+    }
+
+    void setColor(final String _color) {
+        this.m_color = _color;
+    }
+
+    void setDriverStation(final int _driverStation) {
+        this.m_driverStation = _driverStation;
+    }
+
+    void setCrossedLine(final boolean _crossedLine) {
+        this.m_crossedLine = _crossedLine;
+    }
+
+    void setAutoHits(final HashMap<String, Integer> _autoHits) {
+        this.m_autoHits = _autoHits;
+    }
+
+    void setAutoMiss(final HashMap<String, Integer> _autoMiss) {
+        this.m_autoMiss = _autoMiss;
+    }
+
+    void setTimePlayingDefense(final int _time) {
+        this.m_timePlayingDefense = _time;
+    }
+
+    void setTimeDefenseOnTeam(final int _time) {
+        this.m_timeDefenseOnTeam = _time;
+    }
+
+    void setPenalties(final int _penalties) {
+        this.m_penalties = _penalties;
+    }
+
+    void setScoring(final HashMap<String, HashMap<String, Integer>> _scoring) {
+        this.m_scoring = _scoring;
+    }
+
+    void setRotationControl(final boolean _rotationControl) {
+        this.m_rotationControl = _rotationControl;
+    }
+
+    void setColorControl(final boolean _colorControl) {
+        this.m_colorControl = _colorControl;
+    }
+
+    void setAttemptedClimb(final boolean _attemptedClimb) {
+        this.m_attemptedClimb = _attemptedClimb;
+    }
+
+    void setClimb(final boolean _climb) {
+        this.m_climb = _climb;
+    }
+
+    void setLevel(final boolean _level) {
+        this.m_level = _level;
+    }
+
+    void setAttemptedDoubleClimb(final boolean _attemptedDoubleClimb) {
+        this.m_attemptedDoubleClimb = _attemptedDoubleClimb;
+    }
+
+    void setDoubleClimb(final boolean _doubleClimb) {
+        this.m_climb = _doubleClimb;
+    }
+
+    void setBrownedOut(final boolean _brownedOut) {
+        this.m_brownedOut = _brownedOut;
+    }
+
+    void setDisabled(final boolean _disabled) {
+        this.m_disabled = _disabled;
+    }
+
+    void setRedCard(final boolean _redCard) {
+        this.m_redCard = _redCard;
+    }
+
+    void setYellowCard(final boolean _yellowCard) {
+        this.m_yellowCard = _yellowCard;
+    }
+
+    void setName(final String _name) {
+        this.m_name = _name;
+    }
+
+    void setNotes(final String _notes) {
+        this.m_notes = _notes;
+    }
+
+    // **************************************************
+    // Get methods
+    // **************************************************
+
+    // All get methods used to return a value stored in the MatchData object
+
+    @DynamoDBHashKey(attributeName = "Team")
+    int getTeam() {
+        return m_team;
+    }
+
+    @DynamoDBRangeKey(attributeName = "Match")
+    int getMatch() {
+        return m_match;
+    }
 
     @DynamoDBAttribute(attributeName = "Color")
-    public String getColor() { return m_color; }
-    void setColor(final String _color) { this.m_color = _color; }
+    String getColor() {
+        return m_color;
+    }
 
     @DynamoDBAttribute(attributeName = "Driver Station")
-    public int getDriverStation() { return m_driverStation; }
-    void setDriverStation(final int _driverStation) { this.m_driverStation = _driverStation; }
+    int getDriverStation() {
+        return m_driverStation;
+    }
 
     @DynamoDBAttribute(attributeName = "Crossed Line")
-    public boolean getCrossedLine() { return m_crossedLine; }
-    void setCrossedLine(final boolean _crossedLine) { this.m_crossedLine = _crossedLine; }
+    boolean getCrossedLine() {
+        return m_crossedLine;
+    }
 
     @DynamoDBAttribute(attributeName = "Auto Hits")
-    public HashMap<String, Integer> getAutoHits() { return m_autoHits; }
-    void setAutoHits(final HashMap<String, Integer> _autoHits) { this.m_autoHits = _autoHits; }
+    HashMap<String, Integer> getAutoHits() {
+        return m_autoHits;
+    }
 
     @DynamoDBAttribute(attributeName = "Auto Miss")
-    public HashMap<String, Integer> getAutoMiss() { return m_autoMiss; }
-    void setAutoMiss(final HashMap<String, Integer> _autoMiss) { this.m_autoMiss = _autoMiss; }
+    HashMap<String, Integer> getAutoMiss() {
+        return m_autoMiss;
+    }
 
     @DynamoDBAttribute(attributeName = "Time Playing Defense")
-    public int getTimePlayingDefense() { return m_timePlayingDefense; }
-    void setTimePlayingDefense(final int _time) { this.m_timePlayingDefense = _time; }
-
-    @DynamoDBAttribute(attributeName = "Time Defense On Team")
-    public int getTimeDefenseOnTeam() { return m_timeDefenseOnTeam; }
-    void setTimeDefenseOnTeam(final int _time) { this.m_timeDefenseOnTeam = _time; }
-
-    @DynamoDBAttribute(attributeName = "Penalties")
-    public int getPenalties() { return m_penalties; }
-    void setPenalties(final int _penalties) { this.m_penalties = _penalties; }
+    int getTimePlayingDefense() {
+        return m_timePlayingDefense;
+    }
 
     @DynamoDBAttribute(attributeName = "Scoring")
-    public HashMap<String, HashMap<String, Integer>> getScoring() { return m_scoring; }
-    void setScoring(final HashMap<String, HashMap<String, Integer>> _scoring) { this.m_scoring = _scoring; }
+    HashMap<String, HashMap<String, Integer>> getScoring() {
+        return m_scoring;
+    }
+
+    @DynamoDBAttribute(attributeName = "Time Defense On Team")
+    int getTimeDefenseOnTeam() {
+        return m_timeDefenseOnTeam;
+    }
+
+    @DynamoDBAttribute(attributeName = "Penalties")
+    int getPenalties() {
+        return m_penalties;
+    }
 
     @DynamoDBAttribute(attributeName = "Rotation Control")
-    public boolean getRotationControl() { return m_rotationControl; }
-    void setRotationControl(final boolean _rotationControl) { this.m_rotationControl = _rotationControl; }
+    boolean getRotationControl() {
+        return m_rotationControl;
+    }
 
     @DynamoDBAttribute(attributeName = "Color Control")
-    public boolean getColorControl() { return m_colorControl; }
-    void setColorControl(final boolean _colorControl) { this.m_colorControl = _colorControl; }
+    boolean getColorControl() {
+        return m_colorControl;
+    }
 
     @DynamoDBAttribute(attributeName = "Attempted Climb")
-    public boolean getAttemptedClimb() { return m_attemptedClimb; }
-    void setAttemptedClimb(final boolean _attemptedClimb) { this.m_attemptedClimb = _attemptedClimb; }
+    boolean getAttemptedClimb() {
+        return m_attemptedClimb;
+    }
 
     @DynamoDBAttribute(attributeName = "Climb")
-    public boolean getClimb() { return m_climb; }
-    void setClimb(final boolean _climb) { this.m_climb = _climb; }
+    boolean getClimb() {
+        return m_climb;
+    }
 
     @DynamoDBAttribute(attributeName = "Level")
-    public boolean getLevel() { return m_level; }
-    void setLevel(final boolean _level) { this.m_level = _level; }
+    boolean getLevel() {
+        return m_level;
+    }
 
     @DynamoDBAttribute(attributeName = "Attempted Double Climb")
-    public boolean getAttemptedDoubleClimb() { return m_attemptedDoubleClimb; }
-    void setAttemptedDoubleClimb(final boolean _attemptedDoubleClimb) { this.m_attemptedDoubleClimb = _attemptedDoubleClimb; }
+    boolean getAttemptedDoubleClimb() {
+        return m_attemptedDoubleClimb;
+    }
 
     @DynamoDBAttribute(attributeName = "Double Climb")
-    public boolean getDoubleClimb() { return m_attemptedClimb; }
-    void setDoubleClimb(final boolean _doubleClimb) { this.m_climb = _doubleClimb; }
+    boolean getDoubleClimb() {
+        return m_attemptedClimb;
+    }
 
     @DynamoDBAttribute(attributeName = "Browned Out")
-    public boolean getBrownedOut() { return m_brownedOut; }
-    void setBrownedOut(final boolean _brownedOut) { this.m_brownedOut = _brownedOut; }
+    boolean getBrownedOut() {
+        return m_brownedOut;
+    }
 
     @DynamoDBAttribute(attributeName = "Disabled")
-    public boolean getDisabled() { return m_disabled; }
-    void setDisabled(final boolean _disabled) { this.m_disabled = _disabled; }
+    boolean getDisabled() {
+        return m_disabled;
+    }
 
     @DynamoDBAttribute(attributeName = "Red Card")
-    public boolean getRedCard() { return m_redCard; }
-    void setRedCard(final boolean _redCard) { this.m_redCard = _redCard; }
+    boolean getRedCard() {
+        return m_redCard;
+    }
 
     @DynamoDBAttribute(attributeName = "Yellow Card")
-    public boolean getYellowCard() { return m_yellowCard; }
-    void setYellowCard(final boolean _yellowCard) { this.m_yellowCard = _yellowCard; }
+    boolean getYellowCard() {
+        return m_yellowCard;
+    }
 
     @DynamoDBAttribute(attributeName = "Scouter Name")
-    public String getName() { return m_name; }
-    void setName(final String _name) { this.m_name = _name; }
+    String getName() {
+        return m_name;
+    }
 
     @DynamoDBAttribute(attributeName = "Notes")
-    public String getNotes() { return m_notes; }
-    void setNotes(final String _notes) { this.m_notes = _notes; }
+    String getNotes() {
+        return m_notes;
+    }
 }
