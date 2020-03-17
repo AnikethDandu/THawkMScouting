@@ -1,4 +1,4 @@
-# THawkMScouting
+# T-Hawk Master Scouting
 Repository dedicated to Team 1100's master scouting app
 
 ## Installation
