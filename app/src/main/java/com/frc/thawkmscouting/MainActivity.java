@@ -12,8 +12,6 @@ import android.os.Environment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -133,17 +131,16 @@ public class MainActivity extends AppCompatActivity {
         FILE_LABELS[4] = BINDING.mainTextQr5;
         FILE_LABELS[5] = BINDING.mainTextQr6;
 
-        // Bnds and defaults the remove index button
-        final EditText REMOVE_NUMBER_TEXT = BINDING.mainButtonRemoveIndex;
-        REMOVE_NUMBER_TEXT.setText("0");
+        // Binds and defaults the remove index button
+        BINDING.mainButtonRemoveIndex.setText("0");
 
         // Binds the button to remove QR codes
-        final Button REMOVE_BUTTON = BINDING.mainButtonRemoveQr;
-        REMOVE_BUTTON.setOnClickListener((View view) -> {
+        BINDING.mainButtonRemoveQr.setOnClickListener((View view) -> {
             // Set the value of the remove index
-            final int QR_REMOVE_INDEX = (REMOVE_NUMBER_TEXT.getText().toString().equals(""))
+            final String REMOVE_INDEX = BINDING.mainButtonRemoveIndex.getText().toString();
+            final int QR_REMOVE_INDEX = (REMOVE_INDEX.equals(""))
                     ? 0
-                    : Integer.parseInt(REMOVE_NUMBER_TEXT.getText().toString()) - 1;
+                    : Integer.parseInt(REMOVE_INDEX) - 1;
 
             // If the index matches the indices of the QR slots, clear the corresponding slot
             if (QR_REMOVE_INDEX <= 5 && QR_REMOVE_INDEX >= 0) {
@@ -160,16 +157,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Bind the export button
-        final Button EXPORT_BUTTON = BINDING.mainButtonExport;
-        EXPORT_BUTTON.setOnClickListener((View view) ->
-                uploadData()
-        );
+        // If the export button is clicked, upload the data
+        BINDING.mainButtonExport.setOnClickListener((View view) -> uploadData());
 
-        // Bind the scan button
         // If the scan button is pressed, initiate a scan with the current context
-        final Button SCAN_BUTTON = BINDING.mainButtonScanQr;
-        SCAN_BUTTON.setOnClickListener((View view) -> {
+        BINDING.mainButtonScanQr.setOnClickListener((View view) -> {
             final IntentIntegrator INTEGRATOR = new IntentIntegrator(MainActivity.this);
             INTEGRATOR.initiateScan();
         });
