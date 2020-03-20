@@ -12,7 +12,7 @@ import java.util.HashMap;
  *
  * @author Aniketh Dandu - FRC Team 1100
  */
-@DynamoDBTable(tableName = BuildConfig.TABLENAME)
+@DynamoDBTable(tableName = BuildConfig.TABLE_NAME)
 class MatchData {
     private int m_team;
     private int m_match;
